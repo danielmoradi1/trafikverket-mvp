@@ -6,8 +6,11 @@ import { getDb } from '../db'
 const router = Router()
 const JWT_SECRET = process.env.JWT_SECRET || 'train-app-secret-change-in-prod'
 
+// POST/api
+// skapar en ny användare med bcrypt-hashat lösenord 
 router.post('/register', async (req: Request, res: Response) => {
   const { username, email, password } = req.body
+  // Validition for required fields and password length
   if (!username || !email || !password)
     return res.status(400).json({ error: 'Alla fält krävs' })
   if (password.length < 6)
@@ -15,12 +18,16 @@ router.post('/register', async (req: Request, res: Response) => {
 
   try {
     const db = getDb()
+    // Kontrollerar om användaren redan finns 
     const existing = db.prepare('SELECT id FROM users WHERE username = ? OR email = ?').get(username, email)
     if (existing)
       return res.status(409).json({ error: 'Användarnamn eller e-post redan registrerat' })
 
+    // hasha lösenordet
     const hash = await bcrypt.hash(password, 12)
     const result = db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)').run(username, email, hash)
+    
+    // skapar en JWT-token med userID
     const token = jwt.sign({ userId: result.lastInsertRowid, username }, JWT_SECRET, { expiresIn: '8h' })
     return res.status(201).json({ token, user: { id: result.lastInsertRowid, username, email } })
   } catch (err) {
@@ -29,6 +36,7 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 })
 
+// post/api/auth/login -> loggar in en användare med användarnamn eller email och lösenord
 router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body
   if (!username || !password)
@@ -36,10 +44,12 @@ router.post('/login', async (req: Request, res: Response) => {
 
   try {
     const db = getDb()
+    // Tillåter inloggning med både användarnamn och email
     const user = db.prepare('SELECT * FROM users WHERE username = ? OR email = ?').get(username, username) as any
     if (!user)
       return res.status(401).json({ error: 'Felaktiga inloggningsuppgifter' })
 
+    // jämför det angivna lösen med det hashade lösenordet i db
     const match = await bcrypt.compare(password, user.password)
     if (!match)
       return res.status(401).json({ error: 'Felaktiga inloggningsuppgifter' })
@@ -51,7 +61,8 @@ router.post('/login', async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Serverfel vid inloggning' })
   }
 })
-
+// get/api/auth 
+// Används av frontend vid sidladdning för att återställa sessionen 
 router.get('/me', (req: Request, res: Response) => {
   const authHeader = req.headers.authorization
   if (!authHeader?.startsWith('Bearer '))

@@ -2,9 +2,12 @@ import Database from 'better-sqlite3'
 import path from 'path'
 import fs from 'fs'
 
+// Sökväg till SQLite-filen på disk
 const DB_PATH = path.join(__dirname, '../data/train.db')
+// singelton anslutning
 let db: Database.Database
 
+// Öppnar den databasanslutning och returnerar den
 export function getDb(): Database.Database {
   if (!db) {
     fs.mkdirSync(path.dirname(DB_PATH), { recursive: true })
@@ -15,9 +18,10 @@ export function getDb(): Database.Database {
   return db
 }
 
+// Initialize the database and create tables if they don't exist
 export function initDb(): void {
   const db = getDb()
-
+  // Användartabell
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,7 +31,8 @@ export function initDb(): void {
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `)
-
+  
+  // Stationstabell
   db.exec(`
     CREATE TABLE IF NOT EXISTS train_stations (
       id                    INTEGER PRIMARY KEY AUTOINCREMENT,

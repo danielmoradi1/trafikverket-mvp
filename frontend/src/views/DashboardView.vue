@@ -19,7 +19,6 @@
       <div class="toolbar">
         <input v-model="search" type="text" placeholder="Sök station..." />
       </div>
-      
       <AnnouncementPanel :station="selectedStation" />
       <table>
         <thead>

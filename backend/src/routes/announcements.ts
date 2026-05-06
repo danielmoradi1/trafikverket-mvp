@@ -5,10 +5,11 @@ const router = Router()
 
 const API_KEY = process.env.TRAFIKVERKET_API_KEY
 
+// get/api/announcements -> signaturen på stationen, typ av aktivitet (arrival/departure) och hämtar tågannonser från trafikverket API
 router.get('/:signature', requireAuth, async (req: Request, res: Response) => {
   const { signature } = req.params
   const type = (req.query.type as string) || 'departure'
-
+  // Nuvarande tid - filterar bort annonser som redan passerat 
   const now = new Date().toISOString()
   
 
