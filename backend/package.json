@@ -10,6 +10,7 @@
     "bcryptjs": "*",
     "better-sqlite3": "*",
     "cors": "*",
+    "dotenv": "^17.4.2",
     "express": "*",
     "jsonwebtoken": "*"
   },

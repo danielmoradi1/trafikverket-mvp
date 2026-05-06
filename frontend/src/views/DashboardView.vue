@@ -10,6 +10,7 @@
 
     <main>
       <MapView ref="mapRef" :stations="stations" @selectStation="selectStation" />
+      
 
       <div v-if="selectedStation" class="selected-station">
         Vald station: <strong>{{ selectedStation.advertised_name }}</strong>
@@ -18,7 +19,8 @@
       <div class="toolbar">
         <input v-model="search" type="text" placeholder="Sök station..." />
       </div>
-
+      
+      <AnnouncementPanel :station="selectedStation" />
       <table>
         <thead>
           <tr>
@@ -51,6 +53,7 @@
           </tr>
         </tbody>
       </table>
+      
     </main>
   </div>
 </template>
@@ -60,6 +63,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import MapView from '../components/MapView.vue'
+import AnnouncementPanel from '../components/AnnouncementPanel.vue'
 import '../assets/dashboard.css'
 
 const router = useRouter()
