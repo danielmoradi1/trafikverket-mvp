@@ -1,0 +1,26 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "start": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "bcryptjs": "*",
+    "better-sqlite3": "*",
+    "cors": "*",
+    "express": "*",
+    "jsonwebtoken": "*"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "*",
+    "@types/better-sqlite3": "*",
+    "@types/cors": "*",
+    "@types/express": "*",
+    "@types/jsonwebtoken": "*",
+    "@types/node": "*",
+    "nodemon": "*",
+    "ts-node": "*",
+    "typescript": "*"
+  }
+}

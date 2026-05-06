@@ -1,0 +1,4 @@
+node_modules/
+backend/data/train.db
+.env
+dist/
