@@ -1,4 +1,6 @@
 * { box-sizing: border-box; }
+tbody tr { cursor: pointer; }
+tbody tr.active td { background: #f0f7ff; font-weight: 500; }
 
 .dashboard {
   min-height: 100vh;

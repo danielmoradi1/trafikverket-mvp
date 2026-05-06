@@ -9,12 +9,14 @@
     </header>
 
     <main>
+      <MapView ref="mapRef" :stations="stations" @selectStation="selectStation" />
+
+      <div v-if="selectedStation" class="selected-station">
+        Vald station: <strong>{{ selectedStation.advertised_name }}</strong>
+      </div>
+
       <div class="toolbar">
-        <input
-          v-model="search"
-          type="text"
-          placeholder="Sök station..."
-        />
+        <input v-model="search" type="text" placeholder="Sök station..." />
       </div>
 
       <table>
@@ -34,7 +36,13 @@
           <tr v-else-if="error">
             <td colspan="5">{{ error }}</td>
           </tr>
-          <tr v-else v-for="s in filteredStations" :key="s.id">
+          <tr
+            v-else
+            v-for="s in filteredStations"
+            :key="s.id"
+            @click="selectStation(s)"
+            :class="{ active: selectedStation?.id === s.id }"
+          >
             <td>{{ s.advertised_name }}</td>
             <td>{{ s.location_signature }}</td>
             <td>{{ s.short_name }}</td>
@@ -51,6 +59,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import MapView from '../components/MapView.vue'
 import '../assets/dashboard.css'
 
 const router = useRouter()
@@ -66,6 +75,8 @@ interface Station {
 }
 
 const stations = ref<Station[]>([])
+const selectedStation = ref<Station | null>(null)
+const mapRef = ref<InstanceType<typeof MapView> | null>(null)
 const search = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -76,6 +87,11 @@ const filteredStations = computed(() =>
     s.location_signature.toLowerCase().includes(search.value.toLowerCase())
   )
 )
+
+function selectStation(station: Station) {
+  selectedStation.value = station
+  mapRef.value?.zoomTo(station)
+}
 
 async function fetchStations() {
   loading.value = true
