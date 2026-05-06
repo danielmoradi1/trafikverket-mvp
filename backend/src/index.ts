@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import authRoutes from './routes/auth'
+import stationRoutes from './routes/stations'
 import { initDb } from './db'
 
 const app = express()
@@ -12,6 +13,7 @@ app.use(express.json())
 initDb()
 
 app.use('/api/auth', authRoutes)
+app.use('/api/stations', stationRoutes)
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
 app.listen(PORT, () => {

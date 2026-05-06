@@ -17,6 +17,7 @@ export function getDb(): Database.Database {
 
 export function initDb(): void {
   const db = getDb()
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,5 +27,22 @@ export function initDb(): void {
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `)
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS train_stations (
+      id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+      location_signature    TEXT    NOT NULL UNIQUE,
+      advertised_name       TEXT    NOT NULL,
+      short_name            TEXT,
+      primary_location_code TEXT,
+      lat                   REAL,
+      lng                   REAL,
+      platform_lines        TEXT,
+      advertised            INTEGER NOT NULL DEFAULT 1,
+      prognosticated        INTEGER NOT NULL DEFAULT 0,
+      modified_time         TEXT
+    );
+  `)
+
   console.log('Database initialized')
 }

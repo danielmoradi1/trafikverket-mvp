@@ -7,53 +7,93 @@
         <button @click="handleLogout">Logga ut</button>
       </div>
     </header>
+
     <main>
-      <p>Inloggad som <strong>{{ auth.user?.username }}</strong></p>
+      <div class="toolbar">
+        <input
+          v-model="search"
+          type="text"
+          placeholder="Sök station..."
+        />
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Station</th>
+            <th>Signatur</th>
+            <th>Kort namn</th>
+            <th>Lat</th>
+            <th>Lng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="loading">
+            <td colspan="5">Laddar...</td>
+          </tr>
+          <tr v-else-if="error">
+            <td colspan="5">{{ error }}</td>
+          </tr>
+          <tr v-else v-for="s in filteredStations" :key="s.id">
+            <td>{{ s.advertised_name }}</td>
+            <td>{{ s.location_signature }}</td>
+            <td>{{ s.short_name }}</td>
+            <td>{{ s.lat?.toFixed(4) }}</td>
+            <td>{{ s.lng?.toFixed(4) }}</td>
+          </tr>
+        </tbody>
+      </table>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import '../assets/dashboard.css'
 
 const router = useRouter()
 const auth = useAuthStore()
+
+interface Station {
+  id: number
+  advertised_name: string
+  location_signature: string
+  short_name: string
+  lat: number | null
+  lng: number | null
+}
+
+const stations = ref<Station[]>([])
+const search = ref('')
+const loading = ref(false)
+const error = ref<string | null>(null)
+
+const filteredStations = computed(() =>
+  stations.value.filter(s =>
+    s.advertised_name.toLowerCase().includes(search.value.toLowerCase()) ||
+    s.location_signature.toLowerCase().includes(search.value.toLowerCase())
+  )
+)
+
+async function fetchStations() {
+  loading.value = true
+  error.value = null
+  try {
+    const data = await auth.apiFetch<{ stations: Station[] }>('/api/stations')
+    stations.value = data.stations
+  } catch (err) {
+    error.value = (err as Error).message
+  } finally {
+    loading.value = false
+  }
+}
 
 function handleLogout() {
   auth.logout()
   router.push('/login')
 }
+
+onMounted(() => fetchStations())
 </script>
-
-<style scoped>
-.dashboard { min-height: 100vh; background: #f5f5f5; font-family: sans-serif; }
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  background: white;
-  border-bottom: 1px solid #ddd;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-header div { display: flex; align-items: center; gap: 12px; }
-
-.username { font-size: 13px; color: #777; font-weight: 400; }
-
-header button {
-  padding: 6px 14px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: none;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-header button:hover { background: #f5f5f5; }
-
-main { padding: 32px 24px; font-size: 14px; color: #555; }
-</style>

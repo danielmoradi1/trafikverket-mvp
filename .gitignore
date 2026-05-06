@@ -2,3 +2,5 @@ node_modules/
 backend/data/train.db
 .env
 dist/
+backend/data/train.db-shm
+backend/data/train.db-wal
