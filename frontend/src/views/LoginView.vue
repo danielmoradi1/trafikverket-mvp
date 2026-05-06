@@ -3,6 +3,7 @@
     <div class="auth-card">
       <h1>Tågöversikt</h1>
 
+      <!-- tabbar mellan login och reg -->
       <div class="tabs">
         <button :class="{ active: mode === 'login' }" @click="switchMode('login')">Logga in</button>
         <button :class="{ active: mode === 'register' }" @click="switchMode('register')">Registrera</button>
@@ -27,6 +28,7 @@
           <span v-if="fieldErrors.password" class="error">{{ fieldErrors.password }}</span>
         </div>
 
+        <!-- fel-meddelande från backend -->
         <div v-if="auth.error" class="api-error">{{ auth.error }}</div>
 
         <button type="submit" :disabled="auth.loading">
@@ -51,12 +53,14 @@ const mode = ref<Mode>('login')
 const form = reactive({ username: '', email: '', password: '' })
 const fieldErrors = reactive<Record<string, string>>({ username: '', email: '', password: '' })
 
+// byt mellan login och registering
 function switchMode(m: Mode) {
   mode.value = m
   auth.error = null
   Object.keys(fieldErrors).forEach(k => (fieldErrors[k] = ''))
 }
 
+// Validerar formuläret innan submit
 function validateAll(): boolean {
   let valid = true
   Object.keys(fieldErrors).forEach(k => (fieldErrors[k] = ''))
@@ -71,6 +75,7 @@ function validateAll(): boolean {
   return valid
 }
 
+// skicka formuläret - logga in eller registrera broende på läge
 async function handleSubmit() {
   if (!validateAll()) return
   try {

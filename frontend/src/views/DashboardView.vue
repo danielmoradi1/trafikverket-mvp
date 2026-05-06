@@ -9,17 +9,23 @@
     </header>
 
     <main>
+      <!-- Karta med leaflet -->
       <MapView ref="mapRef" :stations="stations" @selectStation="selectStation" />
       
-
+      <!-- Visas när en station är vald -->
       <div v-if="selectedStation" class="selected-station">
         Vald station: <strong>{{ selectedStation.advertised_name }}</strong>
       </div>
 
+      <!-- Sökfält -->
       <div class="toolbar">
         <input v-model="search" type="text" placeholder="Sök station..." />
       </div>
+
+      <!-- Ankomster/avgångar för vald station -->
       <AnnouncementPanel :station="selectedStation" />
+
+      <!-- Stationstabell -->
       <table>
         <thead>
           <tr>
@@ -37,6 +43,7 @@
           <tr v-else-if="error">
             <td colspan="5">{{ error }}</td>
           </tr>
+          <!-- Klick på rad väljer station och zoomar kartan -->
           <tr
             v-else
             v-for="s in filteredStations"
@@ -84,6 +91,7 @@ const search = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
 
+  // Filtrerar stationer baserat på söktext, tanken är att den körs reaktivt när search ändras
 const filteredStations = computed(() =>
   stations.value.filter(s =>
     s.advertised_name.toLowerCase().includes(search.value.toLowerCase()) ||
@@ -91,11 +99,13 @@ const filteredStations = computed(() =>
   )
 )
 
+// Välj station — uppdatera state och zooma kartan
 function selectStation(station: Station) {
   selectedStation.value = station
   mapRef.value?.zoomTo(station)
 }
 
+// Hämta alla stationer från backend vid sidladdning
 async function fetchStations() {
   loading.value = true
   error.value = null

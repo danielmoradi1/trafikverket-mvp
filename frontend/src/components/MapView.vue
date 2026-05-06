@@ -23,6 +23,8 @@ const mapContainer = ref<HTMLElement | null>(null)
 let map: L.Map | null = null
 let markersLayer: L.LayerGroup | null = null
 
+
+// fixar Leaflets default marker-ikoner som inte fungerar med Vite, fick hjälp av AI
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -30,6 +32,8 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 
+
+// Lägg till markers för alla stationer -rensa gamla markers först
 function addMarkers(stations: Station[]) {
   if (!map) return
   markersLayer?.clearLayers()
@@ -47,6 +51,7 @@ function addMarkers(stations: Station[]) {
 onMounted(() => {
   if (!mapContainer.value) return
 
+  // Initiera kartan centrerad över Sverige
   map = L.map(mapContainer.value).setView([62.0, 15.0], 5)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -64,6 +69,7 @@ onUnmounted(() => {
   map?.remove()
 })
 
+// Zooma kartan till en specifik station och öppna popup
 function zoomTo(station: Station) {
   if (!map || !station.lat || !station.lng) return
   map.setView([station.lat, station.lng], 12)

@@ -1,10 +1,12 @@
 <template>
+  <!-- Visar bara panelen om en station är vald -->
   <div class="announcement-panel" v-if="station">
     <div class="panel-header">
       <h2>{{ station.advertised_name }}</h2>
+      <!-- Växla mellan avgångar och ankomster -->
       <div class="tabs">
-        <button :class="{ active: type === 'departure' }" @click="setType('departure')">Avgångar</button>
-        <button :class="{ active: type === 'arrival' }" @click="setType('arrival')">Ankomster</button>
+      <button :class="{ active: type === 'arrival' }" @click="setType('arrival')">Ankomster</button>
+      <button :class="{ active: type === 'departure' }" @click="setType('departure')">Avgångar</button>
       </div>
     </div>
 
@@ -67,6 +69,7 @@ const type = ref<'departure' | 'arrival'>('departure')
 const loading = ref(false)
 const error = ref<string | null>(null)
 
+  // Hämta annonser för vald station
 async function fetchAnnouncements() {
   if (!props.station) return
   loading.value = true
@@ -83,15 +86,17 @@ async function fetchAnnouncements() {
   }
 }
 
+// Byt typ och hämta ny data
 function setType(t: 'departure' | 'arrival') {
   type.value = t
   fetchAnnouncements()
 }
-
+// Formatera ISO-tid till HH:MM
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
 }
 
+// Visa destination
 function getDestination(a: Announcement): string {
   if (a.ActivityType === 'Avgang' && a.ToLocation?.length) {
     return a.ToLocation[0].LocationName

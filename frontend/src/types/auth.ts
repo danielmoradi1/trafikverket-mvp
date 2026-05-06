@@ -1,3 +1,6 @@
+// typ definitions for authentication related data structures
+// Allows ts to warn if we sent wrong data to the api
+// just for user 
 export interface User {
   id: number
   username: string
